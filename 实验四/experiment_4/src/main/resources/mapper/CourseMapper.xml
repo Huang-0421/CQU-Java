@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huang.experiment_4.mapper.GradeMapper">
+    <update id="updateScore" parameterType="com.huang.experiment_4.pojo.Grade">
+        UPDATE ${grade.courseName} g
+        SET
+            g.grade1 = #{grade.grade1},
+            g.grade2 = #{grade.grade2},
+            g.grade3 = #{grade.grade3},
+            g.grade4 = #{grade.grade4},
+            g.grade_avg = #{grade.gradeAvg}
+        WHERE
+            name = #{grade.name}
+          AND class_num = #{grade.classNum}
+    </update>
+
+    <resultMap id="GradeResultMap" type="com.huang.experiment_4.pojo.Grade">
+        <result property="courseName" column="course_name"/>
+        <result property="name" column="name"/>
+        <result property="classNum" column="class"/>
+        <result property="grade1" column="grade1"/>
+        <result property="grade2" column="grade2"/>
+        <result property="grade3" column="grade3"/>
+        <result property="grade4" column="grade4"/>
+        <result property="gradeAvg" column="grade_avg"/>
+    </resultMap>
+
+    <select id="showGrade" resultType="com.huang.experiment_4.pojo.Grade">
+        SELECT * FROM
+        ${course} g
+        WHERE g.name = #{name}
+    </select>
+
+    <select id="showScore" resultType="com.huang.experiment_4.pojo.Grade">
+        SELECT
+        g.*
+        FROM
+        ${course} g   <!-- 动态表名 -->
+        WHERE
+        g.class_num = #{classnum}  <!-- 查找 classNum 对应的班级 -->
+        AND g.name LIKE CONCAT('%', #{name}, '%')  <!-- 模糊查找 name -->
+    </select>
+    <select id="showshowStatistics" resultType="com.huang.experiment_4.pojo.Grade">
+        SELECT
+        g.*
+        FROM
+        ${course} g   <!-- 动态表名 -->
+        WHERE
+        g.class_num  = #{classnum}  <!-- 查找 classNum 对应的班级 -->
+    </select>
+
+    <select id="exportScore" resultType="com.huang.experiment_4.pojo.Grade">
+        SELECT * FROM
+            ${course} g
+        WHERE g.class_num  = #{class}
+    </select>
+
+
+    <insert id="createCourseTable">
+    <![CDATA[
+        CREATE TABLE IF NOT EXISTS ${courseName}
+        (
+            name      CHAR(255) NOT NULL PRIMARY KEY,
+            grade1    INT,
+            grade2    INT,
+            grade3    INT,
+            grade4    INT,
+            grade_avg FLOAT,
+            class_num INT       NOT NULL
+        );
+        ]]>
+  </insert>
+    <insert id="addScore">
+        <!-- 动态构建表名 -->
+        INSERT INTO
+        ${course}  <!-- 使用 ${} 来拼接表名 -->
+        (name, class_num)
+        VALUES
+        (#{name}, #{class_num});
+    </insert>
+</mapper>
